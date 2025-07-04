@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <h2>Dashboard</h2>
+
+  <form id="serverForm">
+    <input type="email" id="email" placeholder="Email Anda" required>
+    <input type="text" id="username" placeholder="Username" required>
+    <input type="text" id="serverName" placeholder="Nama Server (boleh kosong)">
+    <p>RAM: 1536MB | CPU: 100 | Disk: 3072MB</p>
+    <button type="submit">Buat Server</button>
+    <p id="serverInfo"></p>
+  </form>
+
+  <br><br>
+
+  <form id="updateForm">
+    <h3>Ubah Email & Password</h3>
+    <input type="email" id="newEmail" placeholder="Email baru" required>
+    <input type="password" id="newPassword" placeholder="Password baru" required>
+    <button type="submit">Update Akun</button>
+    <p id="updateInfo"></p>
+  </form>
+
+  <script>
+    // Buat server
+    document.getElementById("serverForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      const username = document.getElementById("username").value;
+      let serverName = document.getElementById("serverName").value;
+
+      if (!serverName) {
+        serverName = username; // kalau kosong, pakai username
+      }
+
+      const res = await fetch("/createserver", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, username, name: serverName })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById("serverInfo").innerText = "✅ Server berhasil dibuat!";
+      } else {
+        document.getElementById("serverInfo").innerText = "❌ Gagal: " + JSON.stringify(data.error);
+      }
+    });
+
+    // Update email & password
+    document.getElementById("updateForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const email = document.getElementById("newEmail").value;
+      const password = document.getElementById("newPassword").value;
+
+      const res = await fetch("/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById("updateInfo").innerText = "✅ Berhasil diubah.";
+      } else {
+        document.getElementById("updateInfo").innerText = "❌ Gagal: " + JSON.stringify(data.error);
+      }
+    });
+  </script>
+</body>
+</html>
